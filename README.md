@@ -1,16 +1,67 @@
-# React + Vite
+# SYEDA — Interior Design Studio
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A premium interior design studio website designed to showcase elegant spaces, creative concepts, and modern interior solutions through an immersive digital experience.
 
-Currently, two official plugins are available:
+### 🌐 Live Website
+https://syeda-interior-design.vercel.app/
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## ✨ Features
 
-## React Compiler
+- Luxury-inspired website design
+- Responsive layout for desktop, tablet, and mobile
+- Interactive navigation and service sections
+- Animated transitions and scroll effects
+- GSAP-powered animations
+- Cinematic video background
+- Interactive project showcases
+- Before-and-after comparison slider
+- Service selection and enquiry experience
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🛠️ Technologies Used
 
-## Expanding the Oxlint configuration
+- React.js
+- JavaScript
+- HTML5
+- CSS3
+- GSAP
+- Vite
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+## 💻 Run Locally
+
+Clone the repository:
+
+```bash
+git clone https://github.com/ishrath-dev/syeda-interior-design.git
+```
+
+Navigate to the project:
+
+```bash
+cd syeda-interior-design
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Start the development server:
+
+```bash
+npm run dev
+```
+
+## 🚀 Deployment
+
+Deployed using Vercel.
+
+## 👩‍💻 Developer
+
+**Syeda Ishrath**
+
+GitHub: https://github.com/ishrath-dev
+
+---
+
+© 2026 SYEDA Interior Design Studio. All Rights Reserved.
