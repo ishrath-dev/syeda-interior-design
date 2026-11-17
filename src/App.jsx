@@ -1,320 +1,485 @@
-import { useEffect, useRef, useState } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import './App.css';
 
-gsap.registerPlugin(ScrollTrigger);
+import { useState } from "react";
+import "./App.css";
 
-const projects = [
+const photo = (id, width = 1000) =>
+  `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${width}&q=85`;
+
+const rooms = [
   {
-    title: 'The Beige Residence',
-    category: 'RESIDENTIAL DESIGN',
-    image: 'photo-1600210492486-724fe5c67fb0'
+    name: "Living Room",
+    image: "photo-1600210492486-724fe5c67fb0",
+    description: "Comfortable, elegant spaces for everyday living.",
+    materials: ["Velvet upholstery", "Walnut wood", "Calacatta marble", "Antique brass", "Linen curtains"],
+    finishes: ["Warm beige", "Natural walnut", "Brushed gold"],
   },
   {
-    title: 'Modern Serenity',
-    category: 'LUXURY LIVING',
-    image: 'photo-1600607687939-ce8a6c25118c'
+    name: "Bedroom",
+    image: "photo-1616486338812-3dadae4b4ace",
+    description: "Peaceful retreats designed around comfort.",
+    materials: ["Soft linen", "Oak veneer", "Textured wallpaper", "Velvet headboard", "Warm ambient lighting"],
+    finishes: ["Ivory cream", "Natural oak", "Soft taupe"],
   },
   {
-    title: 'The Art of Living',
-    category: 'CONTEMPORARY DESIGN',
-    image: 'photo-1600566753086-00f18fb6b3ea'
-  }
+    name: "Kitchen",
+    image: "photo-1600607687939-ce8a6c25118c",
+    description: "Functional kitchens with carefully selected finishes.",
+    materials: ["Quartz countertop", "Matte laminate", "Wood veneer", "Glass cabinets", "Brushed steel"],
+    finishes: ["Marble white", "Walnut brown", "Matte ivory"],
+  },
+  {
+    name: "Dining Room",
+    image: "photo-1600210491369-e753d80a41f3",
+    description: "Welcoming dining spaces for memorable gatherings.",
+    materials: ["Solid wood", "Marble tabletop", "Velvet dining chairs", "Pendant lighting", "Decorative wall panels"],
+    finishes: ["Antique wood", "Cream marble", "Aged brass"],
+  },
+  {
+    name: "Workspace",
+    image: "photo-1497366754035-f200968a6e72",
+    description: "Beautiful and productive work environments.",
+    materials: ["Engineered wood", "Acoustic panels", "Glass partitions", "Metal hardware", "Task lighting"],
+    finishes: ["Natural oak", "Charcoal", "Warm white"],
+  },
+  {
+    name: "Entryway",
+    image: "photo-1600607687920-4e2a09cf159d",
+    description: "A beautiful first impression with thoughtful details.",
+    materials: ["Decorative mirror", "Stone flooring", "Console wood", "Antique hardware", "Wall moulding"],
+    finishes: ["Travertine", "Dark walnut", "Antique gold"],
+  },
 ];
 
-const services = [
+const designStyles = [
   {
-    id: 'residential',
-    number: '01',
-    title: 'Residential Interiors',
-    description: 'Beautiful homes designed around your lifestyle.',
-    intro: 'Bring warmth, comfort and personality into every corner of your home.',
-    items: [
-      ['Full Length Mirror', 'Mirrors', 'photo-1618221195710-dd6b41faaea6'],
-      ['Luxury Area Rug', 'Rugs & Mats', 'photo-1600166898405-da9535204843'],
-      ['Marble Side Table', 'Tables', 'photo-1499933374294-4584851497cc'],
-      ['Designer Sofa', 'Furniture', 'photo-1555041469-a586c61ea9bc'],
-      ['Modern Floor Lamp', 'Lighting', 'photo-1507473885765-e6ed057f782c'],
-      ['Indoor Green Plant', 'Decor', 'photo-1485955900006-10f4d324d411'],
-      ['Wall Art', 'Wall Decor', 'photo-1579783902614-a3fb3927b6a5'],
-      ['Decorative Table Set', 'Accessories', 'photo-1490312278390-ab64016e0aa9']
-    ]
+    name: "Modern Minimal",
+    detail: "Clean lines, calm neutrals and uncluttered spaces.",
+    colors: ["#eee7dc", "#b8a28b", "#756454"],
   },
   {
-    id: 'commercial',
-    number: '02',
-    title: 'Commercial Spaces',
-    description: 'Inspiring workspaces with purpose and identity.',
-    intro: 'Create a professional environment that inspires people and reflects your brand.',
-    items: [
-      ['Executive Office Desk', 'Furniture', 'photo-1497366754035-f200968a6e72'],
-      ['Ergonomic Office Chair', 'Seating', 'photo-1505843490538-5133c6c7d0e1'],
-      ['Conference Table', 'Furniture', 'photo-1497366811353-6870744d04b2'],
-      ['Pendant Office Lights', 'Lighting', 'photo-1497366216548-37526070297c'],
-      ['Reception Furniture', 'Reception', 'photo-1497366412874-3415097a27e7'],
-      ['Storage Cabinet', 'Storage', 'photo-1497366754035-f200968a6e72']
-    ]
+    name: "Contemporary",
+    detail: "A balanced mix of current forms and timeless materials.",
+    colors: ["#e8dfd2", "#9c8068", "#51463d"],
   },
   {
-    id: 'planning',
-    number: '03',
-    title: 'Space Planning',
-    description: 'Smart layouts that balance beauty and function.',
-    intro: 'Choose furniture and decor to build a practical, balanced room layout.',
-    items: [
-      ['Full Length Mirror', 'Mirrors', 'photo-1618221195710-dd6b41faaea6'],
-      ['Floor Mat & Area Rug', 'Rugs & Mats', 'photo-1600166898405-da9535204843'],
-      ['Side Table', 'Tables', 'photo-1499933374294-4584851497cc'],
-      ['Three-Seater Sofa', 'Furniture', 'photo-1555041469-a586c61ea9bc'],
-      ['Wall Mirror', 'Mirrors', 'photo-1616486338812-3dadae4b4ace'],
-      ['Table Lamp', 'Lighting', 'photo-1507473885765-e6ed057f782c'],
-      ['Indoor Plant', 'Decor', 'photo-1485955900006-10f4d324d411'],
-      ['Wall Art', 'Wall Decor', 'photo-1579783902614-a3fb3927b6a5']
-    ]
-  }
+    name: "Traditional",
+    detail: "Classic detailing, rich wood and elegant finishes.",
+    colors: ["#e8d9c4", "#98704f", "#493329"],
+  },
+  {
+    name: "Warm Luxury",
+    detail: "Soft textures, warm metals and refined statement pieces.",
+    colors: ["#f0e5d5", "#b28b62", "#6b5140"],
+  },
 ];
 
-function App() {
-  const websiteRef = useRef(null);
-  const cursorRef = useRef(null);
+const finishOptions = [
+  {
+    name: "Natural Oak",
+    type: "Wood",
+    image: "photo-1618221195710-dd6b41faaea6",
+    note: "Light, natural grain with a warm understated finish.",
+  },
+  {
+    name: "Walnut Veneer",
+    type: "Wood",
+    image: "photo-1600607687939-ce8a6c25118c",
+    note: "Deep brown tones for a rich, timeless look.",
+  },
+  {
+    name: "Ivory Marble",
+    type: "Stone",
+    image: "photo-1600607687920-4e2a09cf159d",
+    note: "Soft veining and a bright, elegant surface.",
+  },
+  {
+    name: "Travertine",
+    type: "Stone",
+    image: "photo-1600210492486-724fe5c67fb0",
+    note: "Natural texture with subtle earthy character.",
+  },
+  {
+    name: "Brushed Brass",
+    type: "Metal",
+    image: "photo-1600210491369-e753d80a41f3",
+    note: "A muted golden accent for fixtures and details.",
+  },
+  {
+    name: "Linen Texture",
+    type: "Fabric",
+    image: "photo-1616486338812-3dadae4b4ace",
+    note: "Soft, tactile fabric that adds warmth and comfort.",
+  },
+];
 
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [comparison, setComparison] = useState(50);
-  const [activeService, setActiveService] = useState(null);
-  const [selectedItems, setSelectedItems] = useState([]);
-  const [filter, setFilter] = useState('All');
+const decorItems = [
+  {
+    name: "Lounge Sofa",
+    category: "Furniture",
+    image: "photo-1555041469-a586c61ea9bc",
+    description: "Comfortable seating with timeless elegance.",
+  },
+  {
+    name: "Accent Chair",
+    category: "Furniture",
+    image: "photo-1567538096630-e0c55bd6374c",
+    description: "A statement piece for a refined interior.",
+  },
+  {
+    name: "Coffee Table",
+    category: "Furniture",
+    image: "photo-1499933374294-4584851497cc",
+    description: "Functional design with beautiful detailing.",
+  },
+  {
+    name: "Floor Rug",
+    category: "Textiles",
+    image: "photo-1600210492486-724fe5c67fb0",
+    description: "Add warmth and texture to your space.",
+  },
+  {
+    name: "Pendant Light",
+    category: "Lighting",
+    image: "photo-1507473885765-e6ed057f782c",
+    description: "Create a warm and inviting atmosphere.",
+  },
+  {
+    name: "Ceramic Vase",
+    category: "Decor",
+    image: "photo-1578500494198-246f612d3b3d",
+    description: "Subtle decorative details for your room.",
+  },
+  {
+    name: "Wall Art",
+    category: "Decor",
+    image: "photo-1579783902614-a3fb3927b6a5",
+    description: "Give your walls a personal touch.",
+  },
+  {
+    name: "Table Lamp",
+    category: "Lighting",
+    image: "photo-1507473885765-e6ed057f782c",
+    description: "Soft lighting for a relaxed atmosphere.",
+  },
+];
 
-  // Home page animations
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.from('.navbar', {
-        y: -35,
-        opacity: 0,
-        duration: 0.8
-      });
+function SectionHeading({ eyebrow, title, description }) {
+  return (
+    <div className="section-heading">
+      <span className="eyebrow">{eyebrow}</span>
+      <h2>{title}</h2>
+      {description && <p>{description}</p>}
+    </div>
+  );
+}
 
-      gsap.from('.hero-content > *', {
-        y: 35,
-        opacity: 0,
-        duration: 0.8,
-        stagger: 0.15,
-        delay: 0.2
-      });
+export default function App() {
+  const [selectedRoom, setSelectedRoom] = useState(null);
+  const [slider, setSlider] = useState(50);
+  const [selectedDecor, setSelectedDecor] = useState([]);
+  const [selectedStyle, setSelectedStyle] = useState(designStyles[0]);
+  const [finishOne, setFinishOne] = useState(finishOptions[0]);
+  const [finishTwo, setFinishTwo] = useState(finishOptions[2]);
+  const [spaceWidth, setSpaceWidth] = useState("12");
+  const [spaceLength, setSpaceLength] = useState("15");
+  const [budgetRate, setBudgetRate] = useState("1800");
 
-      gsap.utils.toArray(
-        '.section-label, .section-heading h2, .intro h2, .contact h2'
-      ).forEach((element) => {
-        gsap.from(element, {
-          y: 35,
-          opacity: 0,
-          duration: 0.8,
-          scrollTrigger: {
-            trigger: element,
-            start: 'top 85%',
-            once: true
-          }
-        });
-      });
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    project: "Residential Interior",
+    location: "",
+    message: "",
+  });
 
-      gsap.from('.service-card, .project-card', {
-        y: 45,
-        opacity: 0,
-        duration: 0.8,
-        stagger: 0.15,
-        scrollTrigger: {
-          trigger: '.service-grid',
-          start: 'top 85%',
-          once: true
+  const [formStatus, setFormStatus] = useState("");
+  const [sending, setSending] = useState(false);
+
+  const handleInput = (event) => {
+    setFormData((previous) => ({
+      ...previous,
+      [event.target.name]: event.target.value,
+    }));
+  };
+
+  const toggleDecor = (item) => {
+    setSelectedDecor((previous) =>
+      previous.some((selected) => selected.name === item.name)
+        ? previous.filter((selected) => selected.name !== item.name)
+        : [...previous, item]
+    );
+  };
+
+  const submitEnquiry = async (event) => {
+    event.preventDefault();
+    setSending(true);
+    setFormStatus("");
+
+    try {
+      const response = await fetch(
+        "https://formsubmit.co/ajax/syedaishrathishu786@gmail.com",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            ...formData,
+            _subject: "New SYEDA Interior Studio Enquiry",
+            _captcha: "false",
+          }),
         }
-      });
-    }, websiteRef);
+      );
 
-    return () => ctx.revert();
-  }, []);
+      const result = await response.json();
 
-  // Custom cursor - works on home and service pages
-  useEffect(() => {
-    if (window.matchMedia('(pointer: coarse)').matches) return;
+      if (response.ok && result.success === "true") {
+        setFormStatus(
+          "Thank you! Your enquiry has been submitted successfully."
+        );
 
-    const moveCursor = (event) => {
-      const cursor = cursorRef.current;
-
-      if (!cursor) return;
-
-      gsap.set(cursor, {
-        x: event.clientX,
-        y: event.clientY,
-        opacity: 1,
-        visibility: 'visible'
-      });
-    };
-
-    const hideCursor = () => {
-      const cursor = cursorRef.current;
-
-      if (cursor) {
-        gsap.to(cursor, {
-          opacity: 0,
-          duration: 0.2
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          project: "Residential Interior",
+          location: "",
+          message: "",
         });
+      } else {
+        throw new Error("Submission failed");
       }
-    };
-
-    window.addEventListener('mousemove', moveCursor);
-    document.addEventListener('mouseleave', hideCursor);
-
-    return () => {
-      window.removeEventListener('mousemove', moveCursor);
-      document.removeEventListener('mouseleave', hideCursor);
-    };
-  }, []);
-
-  const closeMenu = () => setMenuOpen(false);
-
-  const openService = (service) => {
-    setActiveService(service);
-    setSelectedItems([]);
-    setFilter('All');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch {
+      setFormStatus(
+        "Unable to submit right now. Please email syedaishrathishu786@gmail.com."
+      );
+    } finally {
+      setSending(false);
+    }
   };
 
-  const goHome = () => {
-    setActiveService(null);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  const area =
+    Math.max(0, Number(spaceWidth) || 0) *
+    Math.max(0, Number(spaceLength) || 0);
 
-  const toggleItem = (item) => {
-    setSelectedItems((current) =>
-      current.some((selected) => selected[0] === item[0])
-        ? current.filter((selected) => selected[0] !== item[0])
-        : [...current, item]
-    );
-  };
+  const estimatedBudget = area * Number(budgetRate);
 
-  const sendEnquiry = () => {
-    if (!activeService || selectedItems.length === 0) return;
+  return (
+    <main>
+      {/* HEADER */}
+      <header className="site-header">
+        <a href="#home" className="brand">
+          <span className="brand-symbol">S</span>
+          <span>
+            <strong>SYEDA</strong>
+            <small>INTERIOR STUDIO</small>
+          </span>
+        </a>
 
-    const itemNames = selectedItems.map((item) => item[0]).join(', ');
-
-    const subject = encodeURIComponent(
-      `SYEDA ${activeService.title} Enquiry`
-    );
-
-    const body = encodeURIComponent(
-      `Hello SYEDA Studio,\n\nI am interested in ${activeService.title}.\n\nSelected items:\n${itemNames}\n\nPlease contact me with more details.\n\nThank you.`
-    );
-
-    window.location.href =
-      `mailto:hello@syedastudio.com?subject=${subject}&body=${body}`;
-  };
-
-  // Service detail pages
-  if (activeService) {
-    const categories = [
-      'All',
-      ...new Set(activeService.items.map((item) => item[1]))
-    ];
-
-    const visibleItems =
-      filter === 'All'
-        ? activeService.items
-        : activeService.items.filter((item) => item[1] === filter);
-
-    return (
-      <div className="service-page">
-
-        {/* Custom cursor on service pages */}
-        <div className="custom-cursor" ref={cursorRef}></div>
-
-        <nav className="service-page-nav">
-          <a
-            href="#home"
-            className="logo"
-            onClick={(event) => {
-              event.preventDefault();
-              goHome();
-            }}
-          >
-            SYEDA<span>.</span>
-            <small>INTERIOR DESIGN STUDIO</small>
+        <nav className="main-nav">
+          <a href="#home">Home</a>
+          <a href="#spaces">Our Expertise</a>
+          <a href="#transformation">Transformation</a>
+          <a href="#material-library">Material Library</a>
+          <a href="#design-studio">Design Studio</a>
+          <a href="#contact" className="nav-contact">
+            Let's Talk ↗
           </a>
-
-          <button
-            className="service-back"
-            onClick={goHome}
-            type="button"
-          >
-            ← Back to Home
-          </button>
         </nav>
+      </header>
 
-        <section className="service-page-hero">
-          <p>{activeService.number} — OUR SERVICES</p>
-          <h1>{activeService.title}</h1>
-          <span>{activeService.intro}</span>
-        </section>
+      {/* HERO */}
+      <section className="hero" id="home">
+        <video className="hero-video" autoPlay muted loop playsInline>
+          <source src="/videos/syeda-interior.mp4" type="video/mp4" />
+        </video>
 
-        <section className="service-selection">
-          <div className="service-selection-heading">
-            <div>
-              <p className="section-label">EXPLORE OUR COLLECTION</p>
-              <h2>Select your <i>essentials.</i></h2>
-              <p className="selection-description">
-                Explore the collection and select the items you would like
-                included in your design enquiry.
-              </p>
+        <div className="hero-overlay" />
+
+        <div className="hero-content">
+          <span className="hero-kicker">
+            INTERIORS THAT FEEL LIKE YOU
+          </span>
+          <h1>
+            Spaces with
+            <br />
+            <em>a story to tell.</em>
+          </h1>
+          <p>
+            Thoughtful interiors, timeless materials and personal details —
+            designed to make every space feel special.
+          </p>
+          <a href="#spaces" className="hero-button">
+            Explore Our Expertise ↗
+          </a>
+        </div>
+
+        <div className="hero-bottom">
+          <span>RESIDENTIAL · COMMERCIAL · BESPOKE</span>
+          <span>SYEDA INTERIOR STUDIO</span>
+        </div>
+      </section>
+
+      {/* INTRO */}
+      <section className="intro-section">
+        <div className="intro-label">THE SYEDA APPROACH</div>
+        <div className="intro-copy">
+          <h2>
+            Good design is not just seen.
+            <br />
+            <em>It is experienced.</em>
+          </h2>
+          <p>
+            We bring together thoughtful planning, beautiful materials and
+            distinctive design styles to create spaces that reflect the people
+            who live and work in them.
+          </p>
+        </div>
+      </section>
+
+      {/* OUR EXPERTISE */}
+      <section className="spaces-section section-pad" id="spaces">
+        <SectionHeading
+          eyebrow="OUR EXPERTISE"
+          title="Spaces made personal."
+          description="Select a space to explore its materials, finishes and design details."
+        />
+
+        <div className="rooms-grid">
+          {rooms.map((room, index) => (
+            <button
+              className="room-card"
+              key={room.name}
+              onClick={() => setSelectedRoom(room)}
+              type="button"
+            >
+              <div className="room-image-wrap">
+                <img src={photo(room.image, 900)} alt={room.name} />
+                <span className="room-number">0{index + 1}</span>
+                <span className="room-arrow">↗</span>
+              </div>
+              <div className="room-card-info">
+                <h3>{room.name}</h3>
+                <p>{room.description}</p>
+                <span className="explore-room">EXPLORE MATERIALS ↗</span>
+              </div>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* BEFORE AND AFTER SLIDER */}
+      <section
+        className="transformation-section section-pad"
+        id="transformation"
+      >
+        <SectionHeading
+          eyebrow="THE ART OF TRANSFORMATION"
+          title="See the difference."
+          description="Move the slider to explore two interior looks in one space."
+        />
+
+        <div className="slider-heading">
+          <h3>Before &amp; After Transformation</h3>
+          <span className="slider-hint">Drag the handle to compare</span>
+        </div>
+
+        <div className="before-after">
+          <div className="before-after-image">
+            <img
+              className="after-image"
+              src={photo("photo-1600210492486-724fe5c67fb0", 1400)}
+              alt="After interior transformation"
+            />
+
+            <div
+              className="before-image-clip"
+              style={{ width: `${slider}%` }}
+            >
+              <img
+                src={photo("photo-1616486029423-aaa4789e8c9a", 1400)}
+                alt="Before interior transformation"
+                style={{ width: `${10000 / Math.max(slider, 1)}%` }}
+              />
             </div>
 
-            <div className="selection-count">
-              <strong>{selectedItems.length}</strong>
-              <span>ITEMS SELECTED</span>
+            <span className="compare-label before-label">BEFORE</span>
+            <span className="compare-label after-label">AFTER</span>
+
+            <div className="slider-line" style={{ left: `${slider}%` }}>
+              <span className="slider-handle">↔</span>
             </div>
+
+            <input
+              aria-label="Compare before and after room"
+              className="slider-input"
+              type="range"
+              min="0"
+              max="100"
+              value={slider}
+              onChange={(event) => setSlider(Number(event.target.value))}
+            />
           </div>
 
-          <div className="service-filters">
-            {categories.map((category) => (
-              <button
-                key={category}
-                className={filter === category ? 'active' : ''}
-                onClick={() => setFilter(category)}
-                type="button"
-              >
-                {category}
-              </button>
-            ))}
+          <p className="comparison-note">
+            A visual example of how thoughtful interior choices can transform a room.
+          </p>
+        </div>
+      </section>
+
+      {/* MATERIAL LIBRARY */}
+      <section
+        className="material-library-section section-pad"
+        id="material-library"
+      >
+        <div className="material-library-top">
+          <div>
+            <span className="eyebrow">EXPLORE OUR COLLECTION</span>
+            <h2>Find your finishing touch.</h2>
+            <p>
+              Explore our curated decor collection and select the pieces
+              that bring your dream space to life.
+            </p>
           </div>
 
-          <div className="item-grid">
-            {visibleItems.map((item) => {
-              const isSelected = selectedItems.some(
-                (selected) => selected[0] === item[0]
+          <span className="playground-number">
+            DESIGN STUDIO / 01
+          </span>
+        </div>
+
+        <div className="material-library-layout">
+          <div className="decor-grid">
+            {decorItems.map((item) => {
+              const isSelected = selectedDecor.some(
+                (selected) => selected.name === item.name
               );
 
               return (
-                <article
-                  className={`item-card ${isSelected ? 'item-selected' : ''}`}
-                  key={item[0]}
-                >
-                  <div className="item-image">
+                <article className="decor-card" key={item.name}>
+                  <div className="decor-image-wrap">
                     <img
-                      src={`https://images.unsplash.com/${item[2]}?auto=format&fit=crop&w=800&q=85`}
-                      alt={item[0]}
+                      src={photo(item.image, 650)}
+                      alt={item.name}
                     />
-                    <span>{item[1]}</span>
+                    <span className="decor-category">
+                      {item.category}
+                    </span>
                   </div>
 
-                  <div className="item-info">
-                    <h3>{item[0]}</h3>
+                  <div className="decor-card-info">
+                    <h3>{item.name}</h3>
+                    <p>{item.description}</p>
 
                     <button
-                      className={
-                        isSelected ? 'selected-button' : 'select-button'
-                      }
-                      onClick={() => toggleItem(item)}
                       type="button"
+                      className={`decor-select-button ${
+                        isSelected ? "selected" : ""
+                      }`}
+                      onClick={() => toggleDecor(item)}
                     >
-                      {isSelected ? '✓ Selected' : '+ Add to Selection'}
+                      {isSelected ? "✓ Selected" : "+ Add item"}
                     </button>
                   </div>
                 </article>
@@ -322,291 +487,469 @@ function App() {
             })}
           </div>
 
-          <div className="selection-summary">
-            <div>
-              <p>YOUR DESIGN SELECTION</p>
-
-              <h3>
-                {selectedItems.length === 0
-                  ? 'No items selected yet'
-                  : `${selectedItems.length} items added to your selection`}
-              </h3>
-
-              {selectedItems.length > 0 && (
-                <div className="selected-list">
-                  {selectedItems.map((item) => (
-                    <span key={item[0]}>{item[0]}</span>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <button
-              className="enquiry-button"
-              disabled={selectedItems.length === 0}
-              onClick={sendEnquiry}
-              type="button"
-            >
-              Send Enquiry ↗
-            </button>
-          </div>
-        </section>
-
-        <footer>
-          <a href="#home" className="logo" onClick={(event) => {
-            event.preventDefault();
-            goHome();
-          }}>
-            SYEDA<span>.</span>
-            <small>INTERIOR DESIGN STUDIO</small>
-          </a>
-
-          <p>© 2026 SYEDA. ALL RIGHTS RESERVED.</p>
-        </footer>
-      </div>
-    );
-  }
-
-  // Main home page
-  return (
-    <div className="website" ref={websiteRef}>
-      <div className="custom-cursor" ref={cursorRef}></div>
-
-      <nav className="navbar">
-        <a href="#home" className="logo" onClick={closeMenu}>
-          SYEDA<span>.</span>
-          <small>INTERIOR DESIGN STUDIO</small>
-        </a>
-
-        <button
-          className="menu-toggle"
-          type="button"
-          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-          aria-expanded={menuOpen}
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          {menuOpen ? '×' : '☰'}
-        </button>
-
-        <div className={`nav-links ${menuOpen ? 'menu-open' : ''}`}>
-          <a href="#home" onClick={closeMenu}>Home</a>
-          <a href="#about" onClick={closeMenu}>About</a>
-          <a href="#services" onClick={closeMenu}>Services</a>
-          <a href="#projects" onClick={closeMenu}>Projects</a>
-          <a href="#contact" onClick={closeMenu}>Contact</a>
-        </div>
-
-        <a href="#contact" className="nav-button">
-          Let's Talk <span>↗</span>
-        </a>
-      </nav>
-
-      <main>
-        <section className="hero" id="home">
-          <video
-            className="hero-video"
-            autoPlay
-            muted
-            loop
-            playsInline
-            poster="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=2000&q=90"
-          >
-            <source src="/videos/syeda-interior.mp4" type="video/mp4" />
-          </video>
-
-          <div className="hero-overlay"></div>
-
-          <div className="hero-content">
-            <p className="eyebrow">ELEVATED INTERIOR EXPERIENCES</p>
-
-            <h1>
-              Spaces that
-              <br />
-              tell your <i>story.</i>
-            </h1>
-
-            <p className="hero-description">
-              Thoughtfully designed interiors that bring elegance,
-              comfort and timeless beauty into everyday living.
+          <aside className="decor-selection-panel">
+            <span className="eyebrow">YOUR COLLECTION</span>
+            <h3>Your selected pieces.</h3>
+            <p>
+              Build your personal collection by choosing items from
+              our library.
             </p>
 
-            <a href="#projects" className="primary-button">
-              Explore Our Work <span>↗</span>
+            <div className="decor-selection-count">
+              <strong>{selectedDecor.length}</strong>
+              <span>ITEMS SELECTED</span>
+            </div>
+
+            {selectedDecor.length === 0 ? (
+              <div className="decor-empty">
+                <span>✧</span>
+                <p>Your selected decor items will appear here.</p>
+              </div>
+            ) : (
+              <div className="selected-decor-list">
+                {selectedDecor.map((item) => (
+                  <div
+                    className="selected-decor-item"
+                    key={item.name}
+                  >
+                    <img
+                      src={photo(item.image, 180)}
+                      alt={item.name}
+                    />
+
+                    <div>
+                      <strong>{item.name}</strong>
+                      <small>{item.category}</small>
+                    </div>
+
+                    <button
+                      type="button"
+                      aria-label={`Remove ${item.name}`}
+                      onClick={() => toggleDecor(item)}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <a
+              href="#contact"
+              className="decor-enquiry-button"
+              onClick={() =>
+                setFormData((previous) => ({
+                  ...previous,
+                  message: selectedDecor.length
+                    ? `I am interested in these decor items: ${selectedDecor
+                        .map((item) => item.name)
+                        .join(", ")}.`
+                    : previous.message,
+                }))
+              }
+            >
+              Discuss your selection ↗
             </a>
+          </aside>
+        </div>
+      </section>
+
+      {/* DESIGN STUDIO */}
+      <section
+        className="design-studio-section section-pad"
+        id="design-studio"
+      >
+        <SectionHeading
+          eyebrow="INTERACTIVE DESIGN STUDIO"
+          title="Make the details yours."
+          description="Explore styles, compare finishes, plan your space and estimate a starting budget."
+        />
+
+        <div className="studio-tool-grid">
+          {/* STYLE FINDER */}
+          <article className="studio-tool studio-style-tool">
+            <div className="studio-tool-heading">
+              <span className="studio-tool-number">01</span>
+              <div>
+                <span className="eyebrow">DISCOVER YOUR LOOK</span>
+                <h3>Style Finder</h3>
+                <p>Choose the design direction that feels most like you.</p>
+              </div>
+            </div>
+
+            <div className="style-options">
+              {designStyles.map((style) => (
+                <button
+                  type="button"
+                  key={style.name}
+                  className={`style-option ${
+                    selectedStyle.name === style.name ? "active" : ""
+                  }`}
+                  onClick={() => setSelectedStyle(style)}
+                >
+                  <span className="style-colors">
+                    {style.colors.map((color) => (
+                      <i key={color} style={{ background: color }} />
+                    ))}
+                  </span>
+                  <span className="style-option-copy">
+                    <strong>{style.name}</strong>
+                    <small>{style.detail}</small>
+                  </span>
+                  <b>{selectedStyle.name === style.name ? "✓" : "↗"}</b>
+                </button>
+              ))}
+            </div>
+
+            <div className="selected-style-note">
+              <strong>Your selected direction: {selectedStyle.name}</strong>
+              <span>{selectedStyle.detail}</span>
+            </div>
+          </article>
+
+          {/* FINISH COMPARISON */}
+          <article className="studio-tool">
+            <div className="studio-tool-heading">
+              <span className="studio-tool-number">02</span>
+              <div>
+                <span className="eyebrow">MATERIAL PAIRING</span>
+                <h3>Finish Comparison</h3>
+                <p>Compare two finishes side by side before making a choice.</p>
+              </div>
+            </div>
+
+            <div className="finish-selectors">
+              <label>
+                FINISH ONE
+                <select
+                  value={finishOne.name}
+                  onChange={(event) =>
+                    setFinishOne(
+                      finishOptions.find(
+                        (item) => item.name === event.target.value
+                      )
+                    )
+                  }
+                >
+                  {finishOptions.map((item) => (
+                    <option key={item.name} value={item.name}>
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label>
+                FINISH TWO
+                <select
+                  value={finishTwo.name}
+                  onChange={(event) =>
+                    setFinishTwo(
+                      finishOptions.find(
+                        (item) => item.name === event.target.value
+                      )
+                    )
+                  }
+                >
+                  {finishOptions.map((item) => (
+                    <option key={item.name} value={item.name}>
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
+            <div className="finish-comparison-grid">
+              {[finishOne, finishTwo].map((finish, index) => (
+                <div
+                  className="finish-preview-card"
+                  key={`${index}-${finish.name}`}
+                >
+                  <img src={photo(finish.image, 700)} alt={finish.name} />
+                  <div>
+                    <small>{finish.type}</small>
+                    <strong>{finish.name}</strong>
+                    <p>{finish.note}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </article>
+
+          {/* SPACE PLANNING */}
+          <article className="studio-tool">
+            <div className="studio-tool-heading">
+              <span className="studio-tool-number">03</span>
+              <div>
+                <span className="eyebrow">PLAN YOUR ROOM</span>
+                <h3>Space Planning</h3>
+                <p>Enter your room dimensions to calculate its floor area.</p>
+              </div>
+            </div>
+
+            <div className="space-planner-visual">
+              <div className="space-plan-box">
+                <span className="space-plan-width">{spaceWidth || "0"} ft</span>
+                <span className="space-plan-length">{spaceLength || "0"} ft</span>
+                <div className="space-plan-center">
+                  <span>ROOM AREA</span>
+                  <strong>{area.toLocaleString("en-IN")} sq.ft</strong>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-inputs">
+              <label>
+                WIDTH (FEET)
+                <input
+                  type="number"
+                  min="0"
+                  step="0.5"
+                  value={spaceWidth}
+                  onChange={(event) => setSpaceWidth(event.target.value)}
+                />
+              </label>
+              <label>
+                LENGTH (FEET)
+                <input
+                  type="number"
+                  min="0"
+                  step="0.5"
+                  value={spaceLength}
+                  onChange={(event) => setSpaceLength(event.target.value)}
+                />
+              </label>
+            </div>
+
+            <p className="studio-disclaimer">
+              A simple floor-area estimate to help begin your space planning.
+            </p>
+          </article>
+
+          {/* BUDGET ESTIMATOR */}
+          <article className="studio-tool studio-budget-tool">
+            <div className="studio-tool-heading">
+              <span className="studio-tool-number">04</span>
+              <div>
+                <span className="eyebrow">PLAN YOUR INVESTMENT</span>
+                <h3>Budget Estimator</h3>
+                <p>Get an indicative interior budget based on your room area.</p>
+              </div>
+            </div>
+
+            <label className="budget-rate-label">
+              ESTIMATED RATE PER SQ.FT
+              <select
+                value={budgetRate}
+                onChange={(event) => setBudgetRate(event.target.value)}
+              >
+                <option value="1200">Essential — ₹1,200 / sq.ft</option>
+                <option value="1800">Comfort — ₹1,800 / sq.ft</option>
+                <option value="2500">Premium — ₹2,500 / sq.ft</option>
+                <option value="3500">Luxury — ₹3,500 / sq.ft</option>
+              </select>
+            </label>
+
+            <div className="budget-result">
+              <span>YOUR INDICATIVE ESTIMATE</span>
+              <strong>₹{estimatedBudget.toLocaleString("en-IN")}</strong>
+              <small>Based on {area.toLocaleString("en-IN")} sq.ft</small>
+            </div>
+
+            <p className="studio-disclaimer">
+              This is an initial planning estimate, not a quotation. Final costs
+              depend on site conditions, materials, scope and specifications.
+            </p>
+
+            <a className="studio-enquiry-link" href="#contact">
+              Discuss your project with us ↗
+            </a>
+          </article>
+        </div>
+      </section>
+
+      {/* CONTACT */}
+      <section className="contact-section section-pad" id="contact">
+        <div className="contact-intro">
+          <span className="eyebrow">LET'S CREATE SOMETHING MEANINGFUL</span>
+          <h2>
+            Your space.
+            <br />
+            <em>Your story.</em>
+          </h2>
+          <p>
+            Tell us a little about your project. We would love to hear your
+            ideas and help bring them to life.
+          </p>
+          <a
+            href="mailto:syedaishrathishu786@gmail.com"
+            className="contact-email"
+          >
+            syedaishrathishu786@gmail.com ↗
+          </a>
+        </div>
+
+        <form className="enquiry-form" onSubmit={submitEnquiry}>
+          <div className="form-heading">
+            <span>01 — START A CONVERSATION</span>
+            <h3>Project Enquiry</h3>
           </div>
 
-          <div className="hero-bottom">
-            <span>01 / 03 — THE ART OF INTERIOR LIVING</span>
-            <span>SCROLL TO EXPLORE ↓</span>
+          <div className="form-row">
+            <label>
+              YOUR NAME *
+              <input
+                name="name"
+                value={formData.name}
+                onChange={handleInput}
+                required
+                placeholder="Full name"
+              />
+            </label>
+
+            <label>
+              EMAIL ADDRESS *
+              <input
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleInput}
+                required
+                placeholder="Your email"
+              />
+            </label>
           </div>
-        </section>
 
-        <section className="intro section-padding" id="about">
-          <div className="section-label">01 — WHO WE ARE</div>
+          <div className="form-row">
+            <label>
+              PHONE NUMBER
+              <input
+                name="phone"
+                value={formData.phone}
+                onChange={handleInput}
+                placeholder="Your phone number"
+              />
+            </label>
 
-          <div className="intro-content">
-            <h2>
-              We create spaces
-              <br />
-              that feel like <i>home.</i>
-            </h2>
+            <label>
+              PROJECT TYPE
+              <select
+                name="project"
+                value={formData.project}
+                onChange={handleInput}
+              >
+                <option>Residential Interior</option>
+                <option>Commercial Interior</option>
+                <option>Renovation</option>
+                <option>Space Planning</option>
+                <option>Other</option>
+              </select>
+            </label>
+          </div>
 
-            <div className="intro-text">
-              <p>
-                We believe great interiors are more than beautiful spaces.
-                They reflect personality, inspire creativity and make
-                everyday moments extraordinary.
-              </p>
+          <label>
+            PROJECT LOCATION
+            <input
+              name="location"
+              value={formData.location}
+              onChange={handleInput}
+              placeholder="City / Location"
+            />
+          </label>
 
-              <a href="#contact" className="text-link">
-                Discover Our Story ↗
+          <label>
+            TELL US ABOUT YOUR PROJECT *
+            <textarea
+              name="message"
+              value={formData.message}
+              onChange={handleInput}
+              required
+              rows="4"
+              placeholder="Share your ideas, requirements and preferred style..."
+            />
+          </label>
+
+          <button className="submit-button" type="submit" disabled={sending}>
+            {sending ? "Sending enquiry..." : "Send Enquiry"}
+            <span>↗</span>
+          </button>
+
+          {formStatus && <p className="form-status">{formStatus}</p>}
+
+          <small className="form-privacy">
+            Your details will only be used to respond to your enquiry.
+          </small>
+        </form>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="site-footer">
+        <a href="#home" className="footer-brand">
+          SYEDA<span> INTERIOR STUDIO</span>
+        </a>
+
+        <p>Thoughtful spaces. Timeless stories.</p>
+
+        <div className="footer-bottom">
+          <span>© 2026 SYEDA INTERIOR STUDIO</span>
+          <a href="#home">BACK TO TOP ↑</a>
+        </div>
+      </footer>
+
+      {/* ROOM MATERIAL DETAILS */}
+      {selectedRoom && (
+        <div
+          className="room-modal-backdrop"
+          onClick={() => setSelectedRoom(null)}
+        >
+          <div
+            className="room-modal"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              className="modal-close"
+              onClick={() => setSelectedRoom(null)}
+              type="button"
+              aria-label="Close room details"
+            >
+              ×
+            </button>
+
+            <img
+              src={photo(selectedRoom.image, 1100)}
+              alt={selectedRoom.name}
+            />
+
+            <div className="room-modal-copy">
+              <span className="eyebrow">OUR EXPERTISE</span>
+              <h2>{selectedRoom.name}</h2>
+              <p>{selectedRoom.description}</p>
+
+              <h3>Materials &amp; Finishes</h3>
+              <div className="room-material-list">
+                {selectedRoom.materials.map((material) => (
+                  <span key={material}>{material}</span>
+                ))}
+              </div>
+
+              <h3>Suggested Colour Finishes</h3>
+              <div className="room-finish-list">
+                {selectedRoom.finishes.map((finish) => (
+                  <span key={finish}>{finish}</span>
+                ))}
+              </div>
+
+              <a
+                href="#contact"
+                onClick={() => setSelectedRoom(null)}
+              >
+                Enquire about this space ↗
               </a>
             </div>
           </div>
-        </section>
-
-        <section className="services section-padding" id="services">
-          <div className="section-heading">
-            <div>
-              <div className="section-label">02 — WHAT WE DO</div>
-              <h2>Designed around <i>you.</i></h2>
-            </div>
-
-            <p>Every detail matters. Every space has a story.</p>
-          </div>
-
-          <div className="service-grid">
-            {services.map((service) => (
-              <button
-                className="service-card"
-                key={service.id}
-                onClick={() => openService(service)}
-                type="button"
-              >
-                <span>{service.number}</span>
-                <h3>{service.title}</h3>
-                <p>{service.description}</p>
-                <b>Explore ↗</b>
-              </button>
-            ))}
-          </div>
-        </section>
-
-        <section className="projects section-padding" id="projects">
-          <div className="section-heading">
-            <div>
-              <div className="section-label">03 — SELECTED WORKS</div>
-              <h2>Spaces we've <i>shaped.</i></h2>
-            </div>
-
-            <p>A collection of spaces made with intention.</p>
-          </div>
-
-          <div className="project-grid">
-            {projects.map((project, index) => (
-              <article className="project-card" key={project.title}>
-                <div className="project-image">
-                  <img
-                    src={`https://images.unsplash.com/${project.image}?auto=format&fit=crop&w=1000&q=85`}
-                    alt={project.title}
-                  />
-
-                  <span className="project-number">0{index + 1}</span>
-                </div>
-
-                <p>{project.category}</p>
-                <h3>{project.title}</h3>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="comparison-section section-padding">
-          <div className="section-label">04 — DESIGN TRANSFORMATION</div>
-
-          <div className="comparison-heading">
-            <h2>A new perspective on <i>living.</i></h2>
-            <p>Explore the difference thoughtful interior design can make.</p>
-          </div>
-
-          <div className="comparison-container">
-            <img
-              className="comparison-before"
-              src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1600&q=90"
-              alt="Before design example"
-            />
-
-            <div
-              className="comparison-after"
-              style={{ clipPath: `inset(0 ${100 - comparison}% 0 0)` }}
-            >
-              <img
-                src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1600&q=90"
-                alt="After design example"
-              />
-            </div>
-
-            <span className="comparison-label before-label">BEFORE</span>
-            <span className="comparison-label after-label">AFTER</span>
-
-            <div
-              className="comparison-divider"
-              style={{ left: `${comparison}%` }}
-            >
-              <span>↔</span>
-            </div>
-
-            <input
-              className="comparison-range"
-              type="range"
-              min="0"
-              max="100"
-              value={comparison}
-              onChange={(event) =>
-                setComparison(Number(event.target.value))
-              }
-              aria-label="Compare before and after interior images"
-            />
-          </div>
-
-          <p className="comparison-hint">DRAG THE SLIDER TO COMPARE</p>
-        </section>
-
-        <section className="statement">
-          <p>THE ART OF THOUGHTFUL LIVING</p>
-
-          <h2>
-            Beauty is in the
-            <br />
-            details <i>we create.</i>
-          </h2>
-
-          <a href="#contact" className="light-button">
-            Start Your Project ↗
-          </a>
-        </section>
-
-        <section className="contact section-padding" id="contact">
-          <div className="section-label">05 — GET IN TOUCH</div>
-          <h2>Let's create something <i>beautiful.</i></h2>
-
-          <a href="mailto:hello@syedastudio.com" className="text-link">
-            hello@syedastudio.com ↗
-          </a>
-        </section>
-      </main>
-
-      <footer>
-        <a href="#home" className="logo">
-          SYEDA<span>.</span>
-          <small>INTERIOR DESIGN STUDIO</small>
-        </a>
-
-        <p>© 2026 SYEDA. ALL RIGHTS RESERVED.</p>
-        <a href="#home">BACK TO TOP ↑</a>
-      </footer>
-    </div>
+        </div>
+      )}
+    </main>
   );
 }
-
-export default App;
